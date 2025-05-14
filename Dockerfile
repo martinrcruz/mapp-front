@@ -1,29 +1,21 @@
-# Build stage
-FROM node:20-alpine as builder
-
-WORKDIR /app
-
-# Install dependencies
-COPY package*.json ./
-RUN npm ci
-
-# Copy source
-COPY . .
-
-# Build app
-RUN npm run build
-
-# Production stage
-FROM nginx:alpine
-
-# Copy built assets from builder
-COPY --from=builder /app/dist/mapp-front/browser /usr/share/nginx/html
-
-# Copy nginx config
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Expose port
-EXPOSE 80
-
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"] 
+# ---------- etapa 1: build ----------
+  FROM node:20-alpine AS builder
+  WORKDIR /app
+  COPY package*.json ./
+  RUN npm ci
+  COPY . .
+  RUN npm run build -- --configuration=production   # o tu comando de build
+  
+  # ---------- etapa 2: runtime ----------
+  FROM nginx:alpine
+  # (opcional) elimina la config por defecto
+  RUN rm /etc/nginx/conf.d/default.conf
+  
+  # COPIAR el output REAL del build
+  # ───────────────┬──────────────┬─────────
+  #                │ proyecto     │ SIN browser
+  COPY --from=builder /app/dist/mapp-frontend /usr/share/nginx/html
+  
+  # (opcional) tu propia nginx.conf
+  # COPY nginx.conf /etc/nginx/conf.d
+  
