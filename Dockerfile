@@ -9,7 +9,6 @@
   # ---------- etapa 2: runtime ----------
   FROM nginx:alpine
   # (opcional) elimina la config por defecto
-  RUN rm /etc/nginx/conf.d/default.conf
   
   # COPIAR el output REAL del build
   # ───────────────┬──────────────┬─────────
