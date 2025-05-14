@@ -1,0 +1,14 @@
+.admin-sidebar {
+  width: 250px;
+  min-height: 100vh;
+  background-color: var(--dark-color);
+  color: var(--light-color);
+  padding: 1rem;
+
+  .nav-link {
+    color: var(--light-color);
+    &:hover {
+      color: var(--primary-color);
+    }
+  }
+} 

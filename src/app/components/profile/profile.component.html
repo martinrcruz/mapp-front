@@ -1,0 +1,123 @@
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-sm mt-5">
+        <div class="card-body p-4">
+          <h2 class="text-center mb-4">Perfil de usuario</h2>
+
+          <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <div class="mb-3">
+              <label for="name" class="form-label">Nombre</label>
+              <input
+                type="text"
+                class="form-control"
+                id="name"
+                formControlName="name"
+                [class.is-invalid]="form.get('name')?.invalid && form.get('name')?.touched"
+                autocomplete="name"
+              />
+              <div class="invalid-feedback" *ngIf="form.get('name')?.errors?.['required']">
+                El nombre es requerido
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="email" class="form-label">Correo electrónico</label>
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                formControlName="email"
+                [class.is-invalid]="form.get('email')?.invalid && form.get('email')?.touched"
+                autocomplete="email"
+                readonly
+              />
+              <small class="text-muted">El correo electrónico no se puede modificar</small>
+            </div>
+
+            <div class="mb-3">
+              <label for="currentPassword" class="form-label">Contraseña actual</label>
+              <input
+                type="password"
+                class="form-control"
+                id="currentPassword"
+                formControlName="currentPassword"
+                [class.is-invalid]="
+                  form.get('currentPassword')?.invalid && form.get('currentPassword')?.touched
+                "
+                autocomplete="current-password"
+              />
+              <div
+                class="invalid-feedback"
+                *ngIf="form.get('currentPassword')?.errors?.['required']"
+              >
+                La contraseña actual es requerida
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="newPassword" class="form-label">Nueva contraseña</label>
+              <input
+                type="password"
+                class="form-control"
+                id="newPassword"
+                formControlName="newPassword"
+                [class.is-invalid]="
+                  form.get('newPassword')?.invalid && form.get('newPassword')?.touched
+                "
+                autocomplete="new-password"
+              />
+              <div class="invalid-feedback" *ngIf="form.get('newPassword')?.errors?.['minlength']">
+                La contraseña debe tener al menos 6 caracteres
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="confirmPassword" class="form-label">Confirmar nueva contraseña</label>
+              <input
+                type="password"
+                class="form-control"
+                id="confirmPassword"
+                formControlName="confirmPassword"
+                [class.is-invalid]="
+                  form.get('confirmPassword')?.invalid && form.get('confirmPassword')?.touched
+                "
+                autocomplete="new-password"
+              />
+              <div
+                class="invalid-feedback"
+                *ngIf="form.get('confirmPassword')?.errors?.['passwordMismatch']"
+              >
+                Las contraseñas no coinciden
+              </div>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="form.invalid || authService.loading"
+              >
+                <span
+                  class="spinner-border spinner-border-sm me-2"
+                  *ngIf="authService.loading"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                Actualizar perfil
+              </button>
+            </div>
+
+            <div class="alert alert-danger mt-3" *ngIf="authService.error">
+              {{ authService.error }}
+            </div>
+
+            <div class="alert alert-success mt-3" *ngIf="successMessage">
+              {{ successMessage }}
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

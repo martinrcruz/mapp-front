@@ -1,0 +1,41 @@
+<div class="bg-dark text-white position-fixed start-0 d-flex flex-column" style="width: 20%; margin-top: 56px; height: calc(100vh - 100px); overflow-y: auto;">
+  <div class="p-4 flex-grow-1">
+    <h2 class="fs-4 fw-bold mb-4">Panel de Administración</h2>
+    <nav class="nav flex-column gap-2">
+      <a
+        routerLink="/admin/dashboard"
+        routerLinkActive="active"
+        class="nav-link text-white"
+      >
+        <i class="fas fa-map me-2"></i>
+        Mapa Interactivo
+      </a>
+      <a
+        routerLink="/admin/locations"
+        routerLinkActive="active"
+        class="nav-link text-white"
+      >
+        <i class="fas fa-map-marker-alt me-2"></i>
+        Locaciones
+      </a>
+      <a
+        routerLink="/admin/users"
+        routerLinkActive="active"
+        class="nav-link text-white"
+      >
+        <i class="fas fa-users me-2"></i>
+        Usuarios
+      </a>
+    </nav>
+  </div>
+  
+  <div class="p-4 mt-auto">
+    <button
+      (click)="logout()"
+      class="btn btn-outline-light w-100 text-start"
+    >
+      <i class="fas fa-sign-out-alt me-2"></i>
+      Cerrar sesión
+    </button>
+  </div>
+</div> 

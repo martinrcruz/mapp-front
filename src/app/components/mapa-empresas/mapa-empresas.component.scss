@@ -1,0 +1,105 @@
+// Estilos para el componente de mapa de empresas
+.map-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-color: #e0e0e0; // Color temporal para debug
+}
+
+.map {
+  width: 100%;
+  height: 100%;
+}
+
+// Estilos para el botón de agregar ubicación
+.btn-primary {
+  box-shadow: var(--box-shadow);
+  transition: all 0.2s ease-in-out;
+  z-index: 1;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px -2px rgb(0 0 0 / 0.15);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  i {
+    margin-right: 0.5rem;
+  }
+}
+
+// Estilos para los popups del mapa
+:host ::ng-deep {
+  .mapboxgl-popup {
+    max-width: 300px;
+  }
+
+  .mapboxgl-popup-content {
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+
+    .popup-content {
+      h6 {
+        margin-bottom: 0.5rem;
+        color: var(--primary-color);
+      }
+
+      p {
+        margin-bottom: 0.25rem;
+        color: var(--body-color);
+      }
+
+      .contact-info {
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--light-color);
+
+        i {
+          margin-right: 0.5rem;
+          color: var(--secondary-color);
+        }
+
+        a {
+          color: var(--primary-color);
+          text-decoration: none;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+
+  .mapboxgl-popup-close-button {
+    font-size: 1.25rem;
+    padding: 0.5rem;
+    color: var(--secondary-color);
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: var(--dark-color);
+      background: none;
+    }
+  }
+}
+
+// Estilos responsivos
+@media (max-width: 768px) {
+  .map-container {
+    height: calc(100vh - 56px); // Ajustar altura considerando la navbar
+  }
+
+  .btn-primary {
+    margin: 1rem !important;
+    padding: 0.5rem 1rem;
+  }
+
+  .mapboxgl-popup {
+    max-width: 250px !important;
+  }
+} 

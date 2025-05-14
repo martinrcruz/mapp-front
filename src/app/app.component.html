@@ -1,0 +1,7 @@
+<app-navbar></app-navbar>
+<div class="d-flex">
+  <app-admin-sidebar *ngIf="isAuthenticated && isAdmin" class="sidebar"></app-admin-sidebar>
+  <div class="main-content" [ngClass]="{'with-sidebar': isAuthenticated && isAdmin}">
+    <router-outlet></router-outlet>
+  </div>
+</div>

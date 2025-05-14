@@ -1,0 +1,35 @@
+<div class="position-relative">
+  <div class="input-group shadow">
+    <span class="input-group-text bg-white border-end-0">
+      <i class="fas fa-search text-muted"></i>
+    </span>
+    <input
+      [formControl]="searchControl"
+      type="text"
+      class="form-control border-start-0"
+      placeholder="Buscar por nombre, dirección, ciudad..."
+      autocomplete="off"
+    />
+  </div>
+
+  <!-- Resultados de búsqueda -->
+  <div *ngIf="results.length > 0" 
+       class="search-results position-absolute w-100 mt-2 bg-white rounded shadow-lg overflow-hidden">
+    <div *ngFor="let location of results"
+         (click)="onLocationClick(location)"
+         class="search-result-item p-3 border-bottom cursor-pointer hover-bg-light">
+      <div class="d-flex align-items-center">
+        <i class="fas me-2" [ngClass]="{
+          'fa-utensils text-danger': location.type === 'restaurant',
+          'fa-hotel text-primary': location.type === 'hotel',
+          'fa-shopping-bag text-success': location.type === 'shop',
+          'fa-map-marker-alt text-info': location.type === 'other'
+        }"></i>
+        <div>
+          <h6 class="mb-1">{{location.name}}</h6>
+          <p class="small text-muted mb-0">{{getFormattedAddress(location)}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

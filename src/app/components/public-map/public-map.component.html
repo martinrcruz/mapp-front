@@ -1,0 +1,140 @@
+<div class="map-container">
+  <!-- Barra de búsqueda -->
+  <div class="position-absolute top-0 start-0 end-0 z-3 pt-5 mt-3 ms-3 me-3">
+    <app-search-bar
+      (search)="onSearch($event)"
+      [results]="searchResults"
+      (locationSelect)="onLocationSelect($event)">
+    </app-search-bar>
+  </div>
+
+  <!-- Contenedor del mapa -->
+  <div #map id="map"></div>
+
+  <!-- Botón de modo edición -->
+  <div *ngIf="authService.isAuthenticated()" class="edit-mode-button" style="margin-top: 10% !important;">
+    <button 
+      class="btn btn-lg" 
+      [class.btn-primary]="editMode" 
+      [class.btn-outline-primary]="!editMode"
+      (click)="toggleEditMode()"
+      title="Modo edición">
+      <i class="fas fa-edit me-2"></i>
+      {{editMode ? 'Modo edición activado' : 'Activar modo edición'}}
+    </button>
+  </div>
+
+  <!-- Modal de nueva ubicación -->
+  <ng-template #locationModal>
+    <div class="modal-header">
+      <h4 class="modal-title">Nueva Ubicación</h4>
+      <button type="button" class="btn-close" aria-label="Close" (click)="closeNewLocationModal()"></button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="isLoading" class="text-center py-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="mt-2">Obteniendo información de la ubicación...</p>
+      </div>
+      
+      <app-location-form 
+        *ngIf="!isLoading"
+        [initialCoordinates]="newLocationCoordinates"
+        [suggestedAddress]="suggestedAddress"
+        (locationSubmit)="onNewLocationSubmit($event)"
+        (cancel)="closeNewLocationModal()">
+      </app-location-form>
+    </div>
+  </ng-template>
+
+  <!-- Tarjeta de información de ubicación -->
+  <div *ngIf="selectedLocation" class="location-card">
+    <div class="location-card-header">
+      <h3 class="location-title">{{selectedLocation?.name}}</h3>
+      <button (click)="closeLocationInfo()" class="close-button">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="location-card-body">
+      <div class="location-type">
+        <i class="fas" [ngClass]="{
+          'fa-utensils': selectedLocation?.type === 'restaurant',
+          'fa-hotel': selectedLocation?.type === 'hotel',
+          'fa-shopping-bag': selectedLocation?.type === 'shop',
+          'fa-map-marker-alt': selectedLocation?.type === 'other'
+        }"></i>
+        <span>{{selectedLocation?.type | titlecase}}</span>
+      </div>
+
+      <div class="location-info">
+        <div class="info-item">
+          <i class="fas fa-map-marker-alt"></i>
+          <div class="info-content">
+            <h6 class="info-label">Dirección</h6>
+            <p>{{selectedLocation?.address?.street}}<br>
+               {{selectedLocation?.address?.city}}, {{selectedLocation?.address?.state}}<br>
+               {{selectedLocation?.address?.postalCode}} {{selectedLocation?.address?.country}}</p>
+          </div>
+        </div>
+
+        <div class="info-item" *ngIf="selectedLocation?.contact?.phone">
+          <i class="fas fa-phone"></i>
+          <div class="info-content">
+            <h6 class="info-label">Teléfono</h6>
+            <p><a [href]="'tel:' + selectedLocation?.contact?.phone">{{selectedLocation?.contact?.phone}}</a></p>
+          </div>
+        </div>
+
+        <div class="info-item" *ngIf="selectedLocation?.contact?.email">
+          <i class="fas fa-envelope"></i>
+          <div class="info-content">
+            <h6 class="info-label">Email</h6>
+            <p><a [href]="'mailto:' + selectedLocation?.contact?.email">{{selectedLocation?.contact?.email}}</a></p>
+          </div>
+        </div>
+
+        <div class="info-item" *ngIf="selectedLocation?.contact?.website">
+          <i class="fas fa-globe"></i>
+          <div class="info-content">
+            <h6 class="info-label">Sitio Web</h6>
+            <p><a [href]="selectedLocation?.contact?.website" target="_blank" rel="noopener noreferrer">
+              Visitar sitio web <i class="fas fa-external-link-alt"></i>
+            </a></p>
+          </div>
+        </div>
+
+        <div class="info-item" *ngIf="selectedLocation?.createdBy">
+          <i class="fas fa-user"></i>
+          <div class="info-content">
+            <h6 class="info-label">Agregado por</h6>
+            <p>{{selectedLocation?.createdBy?.name}}</p>
+          </div>
+        </div>
+
+        <div class="info-item" *ngIf="selectedLocation?.createdAt">
+          <i class="fas fa-calendar"></i>
+          <div class="info-content">
+            <h6 class="info-label">Fecha de registro</h6>
+            <p>{{selectedLocation?.createdAt | date:'longDate'}}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="location-description" *ngIf="selectedLocation?.description">
+        <h6 class="info-label">Descripción</h6>
+        <p>{{selectedLocation?.description}}</p>
+      </div>
+
+      <div class="location-actions mt-3" *ngIf="authService.isAuthenticated()">
+        <button class="btn btn-outline-primary btn-sm me-2" (click)="editLocation(selectedLocation!)">
+          <i class="fas fa-edit me-1"></i> Editar
+        </button>
+        <button class="btn btn-outline-danger btn-sm" (click)="deleteLocation(selectedLocation!)">
+          <i class="fas fa-trash-alt me-1"></i> Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+</div> 

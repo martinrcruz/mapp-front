@@ -1,0 +1,11 @@
+<!-- Template para el componente de mapa de empresas -->
+<div class="map-container">
+  <div #mapContainer class="map"></div>
+  <button
+    class="btn btn-primary position-absolute bottom-0 end-0 m-3"
+    (click)="openLocationForm()"
+    *ngIf="authService.user"
+  >
+    <i class="bi bi-plus-lg"></i> Agregar ubicación
+  </button>
+</div>

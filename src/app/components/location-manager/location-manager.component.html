@@ -1,0 +1,191 @@
+<div class="container-fluid p-4 mt-5">
+  <div class="row mb-4">
+    <div class="col">
+      <h2 class="fs-1 fw-bold">Administración de Locaciones</h2>
+    </div>
+    <div class="col-auto">
+      <button
+        (click)="openAddModal()"
+        class="btn btn-primary"
+      >
+        <i class="fas fa-plus me-2"></i>
+        Agregar Locación
+      </button>
+    </div>
+  </div>
+
+  <div class="card shadow">
+    <div class="card-body">
+      <!-- Barra de búsqueda -->
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0">
+              <i class="fas fa-search text-muted"></i>
+            </span>
+            <input
+              [formControl]="searchControl"
+              type="text"
+              class="form-control border-start-0"
+              placeholder="Buscar por nombre, dirección, tipo..."
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla -->
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Estado</th>
+              <th>Nombre</th>
+              <th>Tipo</th>
+              <th>Dirección</th>
+              <th>Contacto</th>
+              <th>Creado por</th>
+              <th>Fecha</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let location of paginatedLocations">
+              <td>
+                <span class="badge" [ngClass]="{
+                  'bg-success': location.isActive,
+                  'bg-danger': !location.isActive
+                }">
+                  {{ location.isActive ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td>
+                <div class="fw-semibold">{{location.name}}</div>
+                <small class="text-muted">{{location.description}}</small>
+              </td>
+              <td>
+                <span class="badge rounded-pill" [ngClass]="{
+                  'bg-primary': location.type === 'restaurant',
+                  'bg-success': location.type === 'hotel',
+                  'bg-info': location.type === 'shop',
+                  'bg-secondary': location.type === 'other'
+                }">
+                  <i class="fas" [ngClass]="{
+                    'fa-utensils': location.type === 'restaurant',
+                    'fa-hotel': location.type === 'hotel',
+                    'fa-shopping-bag': location.type === 'shop',
+                    'fa-map-marker-alt': location.type === 'other'
+                  }"></i>
+                  {{location.type | titlecase}}
+                </span>
+              </td>
+              <td>
+                <div>{{location.address?.street}}</div>
+                <small class="text-muted">
+                  {{location.address?.city}}, {{location.address?.state}}
+                  <br>{{location.address?.country}}
+                </small>
+              </td>
+              <td>
+                <div *ngIf="location.contact?.phone">
+                  <small><i class="fas fa-phone me-1"></i>{{location.contact.phone}}</small>
+                </div>
+                <div *ngIf="location.contact?.email">
+                  <small><i class="fas fa-envelope me-1"></i>{{location.contact.email}}</small>
+                </div>
+              </td>
+              <td>
+                <div *ngIf="location.createdBy">{{location.createdBy.name}}</div>
+              </td>
+              <td>
+                <small>{{location.createdAt | date:'dd/MM/yyyy'}}</small>
+              </td>
+              <td>
+                <div class="btn-group">
+                  <button
+                    (click)="openEditModal(location)"
+                    class="btn btn-sm btn-outline-primary"
+                    title="Editar"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button
+                    (click)="toggleLocationStatus(location)"
+                    class="btn btn-sm"
+                    [ngClass]="{
+                      'btn-outline-danger': location.isActive,
+                      'btn-outline-success': !location.isActive
+                    }"
+                    [title]="location.isActive ? 'Desactivar' : 'Activar'"
+                  >
+                    <i class="fas" [ngClass]="{
+                      'fa-toggle-on': location.isActive,
+                      'fa-toggle-off': !location.isActive
+                    }"></i>
+                  </button>
+                  <button
+                    (click)="deleteLocation(location._id)"
+                    class="btn btn-sm btn-outline-danger"
+                    title="Eliminar"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="paginatedLocations.length === 0">
+              <td colspan="8" class="text-center py-4">
+                <i class="fas fa-search fa-2x text-muted mb-2"></i>
+                <p class="text-muted mb-0">No se encontraron resultados</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginación -->
+      <div class="d-flex justify-content-between align-items-center mt-4" *ngIf="total > 0">
+        <div class="text-muted">
+          Mostrando {{(page - 1) * pageSize + 1}} - {{Math.min(page * pageSize, total)}} de {{total}} resultados
+        </div>
+        <ngb-pagination
+          [collectionSize]="total"
+          [(page)]="page"
+          [pageSize]="pageSize"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="onPageChange($event)"
+          class="pagination-sm"
+          aria-label="Navegación de páginas"
+        >
+          <ng-template ngbPaginationFirst>««</ng-template>
+          <ng-template ngbPaginationLast>»»</ng-template>
+          <ng-template ngbPaginationPrevious>«</ng-template>
+          <ng-template ngbPaginationNext>»</ng-template>
+        </ngb-pagination>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para agregar/editar locación -->
+  <div *ngIf="showModal" class="modal fade show d-block" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            {{selectedLocation ? 'Editar' : 'Agregar'}} Locación
+          </h5>
+          <button type="button" class="btn-close" (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body">
+          <app-location-form
+            [location]="selectedLocation"
+            (locationSubmit)="saveLocation($event)"
+            (cancel)="closeModal()">
+          </app-location-form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="showModal" class="modal-backdrop fade show"></div>
+</div> 
