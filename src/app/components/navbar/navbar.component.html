@@ -1,18 +1,25 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
   <div class="container-fluid">
-    <img src="assets/logo.png" alt="logo" style="width: 250px; height: 100px;" routerLink="/">
-    <div class="d-flex">
-      <ng-container *ngIf="!authService.isAuthenticated()">
-        <button (click)="login()" class="btn btn-primary" style="margin-right: 10%; width: 200px; background-color: #85BC21; color: #fff; border: none;">
-          <i class="fas fa-sign-in-alt"></i>
-          Acceder
-        </button>
-      </ng-container>
-      <!-- <ng-container *ngIf="authService.isAuthenticated()">
-        <button (click)="logout()" class="btn btn-outline-secondary">
-          Cerrar Sesión
-        </button>
-      </ng-container> -->
+    <div class="row w-100">
+      <div class="col-3">
+        <img src="assets/logo.png" alt="logo" style="width: 250px; height: 100px;" routerLink="/">
+      </div>
+      <div class="col-6 text-center mt-4" routerLink="/" style="cursor: pointer;">
+        <strong>
+          <h1>MAPA DE EMPRESAS</h1>
+        </strong>
+      </div>
+
+       
+      <div class="col-3 mt-4 text-end">
+        <ng-container *ngIf="!authService.isAuthenticated()">
+          <button (click)="login()" class="btn btn-primary"
+            style=" width: 200px; background-color: #85BC21; color: #fff; border: none;">
+            <i class="fas fa-sign-in-alt"></i>
+            Acceder
+          </button>
+        </ng-container>
+      </div>
     </div>
   </div>
-</nav> 
+</nav>

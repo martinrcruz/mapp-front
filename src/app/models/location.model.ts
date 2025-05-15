@@ -1,4 +1,3 @@
-
 export interface Coordinates {
   type: 'Point';
   coordinates: [number, number]; // [longitude, latitude]
@@ -40,8 +39,9 @@ export interface Location {
 
 export interface LocationResponse {
   success: boolean;
-  count: number;
   data: Location[];
+  count?: number;
+  error?: string;
 }
 
 export interface CreateLocationRequest {

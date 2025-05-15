@@ -23,9 +23,11 @@ export class SearchBarComponent implements OnInit {
       debounceTime(300),
       distinctUntilChanged()
     ).subscribe(value => {
-      if (value && value.length >= 2) {
-        this.search.emit(value);
-      } else {
+      const searchValue = value || '';
+      if (searchValue.length >= 2 || searchValue === '') {
+        this.search.emit(searchValue);
+      }
+      if (!searchValue) {
         this.results = [];
       }
     });

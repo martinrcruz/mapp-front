@@ -116,9 +116,19 @@ export class PublicMapComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  onSearch(query: any) {
-    this.locationService.searchLocations(query.value).subscribe(results => {
-      this.searchResults = results;
+  onSearch(query: string) {
+    if (query === '') {
+      this.searchResults = [];
+      return;
+    }
+    this.locationService.searchLocations(query).subscribe({
+      next: (results) => {
+        this.searchResults = results;
+      },
+      error: (error) => {
+        console.error('Error en la búsqueda:', error);
+        this.searchResults = [];
+      }
     });
   }
 

@@ -23,13 +23,13 @@ import { AuthService } from './services/auth.service';
         top: 0;
         left: 0;
         right: 0;
-        height: 56px;
+        height: 130px;
         z-index: 1030;
       }
 
       .d-flex {
-        height: calc(100vh - 56px);
-        margin-top: 56px;
+        height: calc(100vh - 130px);
+        margin-top: 130px;
         overflow: hidden;
       }
 

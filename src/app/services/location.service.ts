@@ -127,7 +127,17 @@ export class LocationService {
   }
 
   searchLocations(query: string): Observable<Location[]> {
-    return this.http.get<Location[]>(`${this.API_URL}/search?q=${encodeURIComponent(query)}`);
+    const searchUrl = `${this.API_URL}/buscar`;
+    return this.http.get<LocationResponse>(searchUrl, {
+      params: { texto: query }
+    }).pipe(
+      map(response => {
+        if (!response.success) {
+          throw new Error(response.error || 'Error en la búsqueda');
+        }
+        return response.data;
+      })
+    );
   }
 
   getLocationById(id: string): Observable<Location> {

@@ -2,11 +2,18 @@ import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChange
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Location, CreateLocationRequest, Coordinates, Address } from '../../models/location.model';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+import { debounceTime, distinctUntilChanged, switchMap, catchError } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { NgbModal, NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
+import { GeocodingService, GeocodingResult } from '../../services/geocoding.service';
+import { MapPickerModalComponent } from '../map-picker-modal/map-picker-modal.component';
 
 @Component({
   selector: 'app-location-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, NgbTypeaheadModule],
   template: `
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="row g-3">
       <!-- Información básica -->
@@ -61,25 +68,60 @@ import { Location, CreateLocationRequest, Coordinates, Address } from '../../mod
       <!-- Dirección -->
       <div class="col-12">
         <h6 class="form-section-title mt-3">Dirección</h6>
+        <div class="mb-3">
+          <div class="btn-group w-100" role="group">
+            <input type="radio" class="btn-check" name="addressMethod" id="searchMethod" [checked]="addressMethod === 'search'" (change)="setAddressMethod('search')">
+            <label class="btn btn-outline-primary" for="searchMethod">
+              <i class="fas fa-search me-2"></i>Buscar dirección
+            </label>
+
+            <input type="radio" class="btn-check" name="addressMethod" id="mapMethod" [checked]="addressMethod === 'map'" (change)="setAddressMethod('map')">
+            <label class="btn btn-outline-primary" for="mapMethod">
+              <i class="fas fa-map-marker-alt me-2"></i>Seleccionar en el mapa
+            </label>
+          </div>
+        </div>
       </div>
 
       <div formGroupName="address">
-        <div class="col-12">
-          <label for="street" class="form-label">Dirección *</label>
+        <div class="col-12" *ngIf="addressMethod === 'search'">
+          <label for="addressSearch" class="form-label">Buscar dirección *</label>
           <input
             type="text"
             class="form-control"
-            id="street"
-            formControlName="street"
-            [class.is-invalid]="form.get('address.street')?.invalid && form.get('address.street')?.touched"
+            id="addressSearch"
+            [ngbTypeahead]="searchAddresses"
+            [inputFormatter]="formatAddress"
+            [resultFormatter]="formatAddress"
+            (selectItem)="onAddressSelected($event)"
+            placeholder="Escribe para buscar direcciones..."
           />
-          <div class="invalid-feedback" *ngIf="form.get('address.street')?.errors?.['required']">
-            La dirección es requerida
-          </div>
         </div>
 
+        <div class="col-12" *ngIf="addressMethod === 'map'">
+          <button type="button" class="btn btn-outline-primary w-100" (click)="openMapPicker()">
+            <i class="fas fa-map-marker-alt me-2"></i>
+            {{ form.get('coordinates.coordinates')?.value?.length ? 'Cambiar ubicación en el mapa' : 'Seleccionar ubicación en el mapa' }}
+          </button>
+        </div>
+
+        <!-- Campos de dirección -->
         <div class="row mt-3">
-          <div class="col-md-6">
+          <div class="col-12">
+            <label for="street" class="form-label">Dirección *</label>
+            <input
+              type="text"
+              class="form-control"
+              id="street"
+              formControlName="street"
+              [class.is-invalid]="form.get('address.street')?.invalid && form.get('address.street')?.touched"
+            />
+            <div class="invalid-feedback" *ngIf="form.get('address.street')?.errors?.['required']">
+              La dirección es requerida
+            </div>
+          </div>
+
+          <div class="col-md-6 mt-3">
             <label for="city" class="form-label">Ciudad *</label>
             <input
               type="text"
@@ -92,7 +134,8 @@ import { Location, CreateLocationRequest, Coordinates, Address } from '../../mod
               La ciudad es requerida
             </div>
           </div>
-          <div class="col-md-6">
+
+          <div class="col-md-6 mt-3">
             <label for="state" class="form-label">Estado/Región *</label>
             <input
               type="text"
@@ -128,6 +171,41 @@ import { Location, CreateLocationRequest, Coordinates, Address } from '../../mod
               class="form-control"
               id="postalCode"
               formControlName="postalCode"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Coordenadas -->
+      <div class="col-12">
+        <h6 class="form-section-title mt-3">Coordenadas</h6>
+        <div *ngIf="isLoading" class="text-center py-2">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Buscando coordenadas...</span>
+          </div>
+          <p class="mt-2">Buscando coordenadas...</p>
+        </div>
+      </div>
+
+      <div formGroupName="coordinates">
+        <input type="hidden" formControlName="type" />
+        <div class="row">
+          <div class="col-md-6">
+            <label class="form-label">Longitud</label>
+            <input
+              type="number"
+              class="form-control"
+              [value]="form.get('coordinates.coordinates')?.value?.[0]"
+              readonly
+            />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Latitud</label>
+            <input
+              type="number"
+              class="form-control"
+              [value]="form.get('coordinates.coordinates')?.value?.[1]"
+              readonly
             />
           </div>
         </div>
@@ -179,35 +257,6 @@ import { Location, CreateLocationRequest, Coordinates, Address } from '../../mod
         </div>
       </div>
 
-      <!-- Coordenadas -->
-      <div class="col-12">
-        <h6 class="form-section-title mt-3">Ubicación en el mapa</h6>
-      </div>
-
-      <div formGroupName="coordinates">
-        <input type="hidden" formControlName="type" />
-        <div class="row">
-          <div class="col-md-6">
-            <label class="form-label">Longitud</label>
-            <input
-              type="number"
-              class="form-control"
-              [value]="form.get('coordinates.coordinates')?.value?.[0]"
-              readonly
-            />
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Latitud</label>
-            <input
-              type="number"
-              class="form-control"
-              [value]="form.get('coordinates.coordinates')?.value?.[1]"
-              readonly
-            />
-          </div>
-        </div>
-      </div>
-
       <!-- Botones de acción -->
       <div class="col-12 mt-4">
         <div class="d-flex justify-content-end gap-2">
@@ -253,10 +302,16 @@ export class LocationFormComponent implements OnInit, OnChanges {
   @Output() cancel = new EventEmitter<void>();
 
   form!: FormGroup;
+  isLoading = false;
+  addressMethod: 'search' | 'map' = 'search';
 
-  constructor(private fb: FormBuilder) {}
+  constructor(
+    private fb: FormBuilder,
+    private geocodingService: GeocodingService,
+    private modalService: NgbModal
+  ) {}
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.initForm();
   }
 
@@ -283,14 +338,14 @@ export class LocationFormComponent implements OnInit, OnChanges {
       type: ['', [Validators.required]],
       coordinates: this.fb.group({
         type: ['Point'],
-        coordinates: [this.location?.coordinates?.coordinates || this.initialCoordinates?.coordinates || [], [Validators.required]]
+        coordinates: [[], [Validators.required]]
       }),
       address: this.fb.group({
-        street: [this.location?.address?.street || this.suggestedAddress?.street || '', [Validators.required]],
-        city: [this.location?.address?.city || this.suggestedAddress?.city || '', [Validators.required]],
-        state: [this.location?.address?.state || this.suggestedAddress?.state || '', [Validators.required]],
-        country: [this.location?.address?.country || this.suggestedAddress?.country || '', [Validators.required]],
-        postalCode: [this.location?.address?.postalCode || this.suggestedAddress?.postalCode || '']
+        street: ['', [Validators.required]],
+        city: ['', [Validators.required]],
+        state: ['', [Validators.required]],
+        country: ['', [Validators.required]],
+        postalCode: ['']
       }),
       contact: this.fb.group({
         phone: [''],
@@ -302,6 +357,69 @@ export class LocationFormComponent implements OnInit, OnChanges {
     if (this.location) {
       this.form.patchValue(this.location);
     }
+  }
+
+  setAddressMethod(method: 'search' | 'map'): void {
+    this.addressMethod = method;
+  }
+
+  // Función para el typeahead de direcciones
+  searchAddresses = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap((term: string) => this.geocodingService.searchAddress(term))
+    );
+
+  // Formateador para mostrar las direcciones en el typeahead
+  formatAddress = (result: GeocodingResult) => result.placeName;
+
+  // Manejador de selección de dirección
+  onAddressSelected(event: any): void {
+    const result: GeocodingResult = event.item;
+    
+    this.form.patchValue({
+      coordinates: {
+        type: 'Point',
+        coordinates: result.coordinates
+      },
+      address: result.address
+    });
+  }
+
+  // Abrir el modal del mapa
+  openMapPicker(): void {
+    const modalRef = this.modalService.open(MapPickerModalComponent, {
+      size: 'lg',
+      backdrop: 'static'
+    });
+
+    // Pasar coordenadas iniciales si existen
+    const currentCoordinates = this.form.get('coordinates.coordinates')?.value;
+    if (currentCoordinates?.length === 2) {
+      modalRef.componentInstance.initialCoordinates = currentCoordinates;
+    }
+
+    // Pasar el nombre de la ubicación
+    modalRef.componentInstance.locationName = this.form.get('name')?.value;
+
+    // Manejar la selección de ubicación
+    modalRef.result.then(
+      (coordinates: [number, number]) => {
+        if (coordinates) {
+          // Confirmar la selección
+          if (confirm(`¿Estás seguro que deseas registrar esta ubicación "${this.form.get('name')?.value}"?`)) {
+            this.form.patchValue({
+              coordinates: {
+                type: 'Point',
+                coordinates: coordinates
+              }
+            });
+          }
+        }
+      },
+      () => {} // Dismiss
+    );
   }
 
   onSubmit(): void {

@@ -1,6 +1,6 @@
-<div class="map-container">
+<div class="map-container" style="border-top: 25px solid #2b3454;">
   <!-- Barra de búsqueda -->
-  <div class="position-absolute top-0 start-0 end-0 z-3 pt-5 mt-3 ms-3 me-3">
+  <div class="position-absolute top-0 start-0 end-0 z-3 mt-3 ms-3 me-3">
     <app-search-bar
       (search)="onSearch($event)"
       [results]="searchResults"
@@ -9,10 +9,12 @@
   </div>
 
   <!-- Contenedor del mapa -->
-  <div #map id="map"></div>
+  <div #map id="map">
+    
+  </div>
 
   <!-- Botón de modo edición -->
-  <div *ngIf="authService.isAuthenticated()" class="edit-mode-button" style="margin-top: 10% !important;">
+  <div *ngIf="authService.isAuthenticated()" class="edit-mode-button" style="margin-top: 12% !important;">
     <button 
       class="btn btn-lg" 
       [class.btn-primary]="editMode" 
