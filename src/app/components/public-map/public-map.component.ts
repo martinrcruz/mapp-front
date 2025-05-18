@@ -68,8 +68,8 @@ export class PublicMapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.map = new Map({
       container: this.mapElement.nativeElement,
       style: 'mapbox://styles/mapbox/streets-v12',
-      center: [-70.6483, -33.4569],
-      zoom: 12,
+      center: environment.defaultMapCenter as [number, number],
+      zoom: environment.defaultMapZoom,
       accessToken: environment.mapboxToken
     });
 
