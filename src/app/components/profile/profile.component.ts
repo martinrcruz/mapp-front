@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { AlertService } from '../../services/alert.service';
 
 @Component({
   selector: 'app-profile',
@@ -14,17 +15,16 @@ import { AuthService } from '../../services/auth.service';
 export class ProfileComponent implements OnInit {
   form!: FormGroup;
   successMessage = '';
-  passwordChangeSuccess = false;
-  passwordChangeError = '';
 
   constructor(
     private fb: FormBuilder,
     public authService: AuthService,
-    private router: Router
+    private router: Router,
+    private alertService: AlertService
   ) {}
 
   ngOnInit(): void {
-    const user = this.authService.user;
+    const user = this.authService.currentUserValue;
     if (!user) {
       this.router.navigate(['/login']);
       return;
@@ -62,13 +62,18 @@ export class ProfileComponent implements OnInit {
       const { currentPassword, newPassword, _confirmPassword } = this.form.value;
       this.authService.updateProfile(this.form.value).subscribe({
         next: () => {
-          this.successMessage = 'Perfil actualizado correctamente';
+          this.alertService.success('Éxito', 'Perfil actualizado correctamente');
+          // this.successMessage = 'Perfil actualizado correctamente';
           this.form.patchValue({
             currentPassword: '',
             newPassword: '',
             confirmPassword: '',
           });
         },
+        error: (error) => {
+          this.alertService.error('Error', 'No se pudo actualizar el perfil');
+          console.error('Error al actualizar el perfil:', error);
+        }
       });
     }
   }
@@ -78,11 +83,16 @@ export class ProfileComponent implements OnInit {
       const { currentPassword, newPassword } = this.form.value;
       this.authService.changePassword(currentPassword, newPassword).subscribe({
         next: () => {
-          this.passwordChangeSuccess = true;
-          this.form.reset();
+          this.alertService.success('Éxito', 'Contraseña cambiada correctamente');
+          this.successMessage = 'Contraseña cambiada correctamente';
+          this.form.patchValue({
+            currentPassword: '',
+            newPassword: '',
+            confirmPassword: '',
+          });
         },
         error: (error: Error) => {
-          this.passwordChangeError = 'Error al cambiar la contraseña';
+          this.alertService.error('Error', 'No se pudo cambiar la contraseña');
           console.error('Error al cambiar contraseña:', error.message);
         }
       });

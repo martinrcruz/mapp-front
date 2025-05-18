@@ -96,11 +96,11 @@
               <button
                 type="submit"
                 class="btn btn-primary"
-                [disabled]="form.invalid || authService.loading"
+                [disabled]="form.invalid || (authService.loading$ | async)"
               >
                 <span
                   class="spinner-border spinner-border-sm me-2"
-                  *ngIf="authService.loading"
+                  *ngIf="authService.loading$ | async"
                   role="status"
                   aria-hidden="true"
                 ></span>
@@ -108,13 +108,13 @@
               </button>
             </div>
 
-            <div class="alert alert-danger mt-3" *ngIf="authService.error">
-              {{ authService.error }}
+            <div class="alert alert-danger mt-3" *ngIf="authService.error$ | async as error">
+              {{ error }}
             </div>
-
+<!-- 
             <div class="alert alert-success mt-3" *ngIf="successMessage">
               {{ successMessage }}
-            </div>
+            </div> -->
           </form>
         </div>
       </div>

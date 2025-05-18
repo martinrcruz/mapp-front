@@ -6,6 +6,7 @@ import { User } from '../../models/user.model';
 import { UserFormComponent } from '../user-form/user-form.component';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { AlertService } from '../../services/alert.service';
 
 @Component({
   selector: 'app-user-manager',
@@ -37,7 +38,10 @@ export class UserManagerComponent implements OnInit {
   // Para usar Math en el template
   protected Math = Math;
 
-  constructor(private userService: UserService) {
+  constructor(
+    private userService: UserService,
+    private alertService: AlertService
+  ) {
     this.searchControl.valueChanges.pipe(
       debounceTime(300),
       distinctUntilChanged()
@@ -51,9 +55,15 @@ export class UserManagerComponent implements OnInit {
   }
 
   loadUsers() {
-    this.userService.getUsers().subscribe(response => {
-      this.users = response;
-      this.filterUsers(this.searchControl.value || '');
+    this.userService.getUsers().subscribe({
+      next: (response) => {
+        this.users = response;
+        this.filterUsers(this.searchControl.value || '');
+      },
+      error: (error) => {
+        this.alertService.error('Error', 'No se pudieron cargar los usuarios');
+        console.error('Error al cargar usuarios:', error);
+      }
     });
   }
 
@@ -88,35 +98,46 @@ export class UserManagerComponent implements OnInit {
 
   openEditModal(user: User) {
     this.selectedUser = user;
+    console.log(user)
     this.showModal = true;
   }
 
   closeModal() {
     this.showModal = false;
-    this.selectedUser = undefined;
+    // this.selectedUser = undefined;
   }
 
   toggleUserStatus(user: User) {
     user.isActive = !user.isActive;
     this.userService.updateUser(user._id, user).subscribe({
-      next: () => this.loadUsers(),
+      next: () => {
+        this.loadUsers();
+        this.alertService.success('Éxito', 'Estado del usuario actualizado correctamente');
+      },
       error: (error) => {
         console.error('Error al actualizar el estado:', error);
         user.isActive = !user.isActive; // Revertir cambio en caso de error
+        this.alertService.error('Error', 'No se pudo actualizar el estado del usuario');
       }
     });
   }
 
   deleteUser(userId: string) {
-    if (confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
-      this.userService.deleteUser(userId).subscribe({
-        next: () => this.loadUsers(),
-        error: (error) => {
-          console.error('Error al eliminar el usuario:', error);
-          alert('No se pudo eliminar el usuario. Por favor, inténtalo de nuevo.');
+    this.alertService.confirm('Confirmación', '¿Estás seguro de que deseas eliminar este usuario?')
+      .then((result) => {
+        if (result.isConfirmed) {
+          this.userService.deleteUser(userId).subscribe({
+            next: () => {
+              this.loadUsers();
+              this.alertService.success('Éxito', 'Usuario eliminado correctamente');
+            },
+            error: (error) => {
+              console.error('Error al eliminar el usuario:', error);
+              this.alertService.error('Error', 'No se pudo eliminar el usuario');
+            }
+          });
         }
       });
-    }
   }
 
   saveUser(userData: any) {
@@ -128,10 +149,13 @@ export class UserManagerComponent implements OnInit {
       next: () => {
         this.closeModal();
         this.loadUsers();
+        console.log(this.selectedUser)
+        const action = this.selectedUser ? 'actualizado' : 'creado';
+        this.alertService.success('Éxito', `Usuario ${action} correctamente`);
       },
       error: (error) => {
         console.error('Error al guardar el usuario:', error);
-        alert('No se pudo guardar el usuario. Por favor, inténtalo de nuevo.');
+        this.alertService.error('Error', 'No se pudo guardar el usuario');
       }
     });
   }

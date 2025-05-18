@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { AlertService } from '../../services/alert.service';
 
 @Component({
   selector: 'app-register',
@@ -100,20 +101,16 @@ import { AuthService } from '../../services/auth.service';
                   <button
                     type="submit"
                     class="btn btn-primary"
-                    [disabled]="form.invalid || authService.loading"
+                    [disabled]="form.invalid || (authService.loading$ | async)"
                   >
                     <span
                       class="spinner-border spinner-border-sm me-2"
-                      *ngIf="authService.loading"
+                      *ngIf="authService.loading$ | async"
                       role="status"
                       aria-hidden="true"
                     ></span>
                     Registrarse
                   </button>
-                </div>
-
-                <div class="alert alert-danger mt-3" *ngIf="authService.error">
-                  {{ authService.error }}
                 </div>
 
                 <div class="text-center mt-3">
@@ -136,7 +133,8 @@ export class RegisterComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     public authService: AuthService,
-    private router: Router
+    private router: Router,
+    private alertService: AlertService
   ) {}
 
   ngOnInit(): void {
@@ -153,7 +151,7 @@ export class RegisterComponent implements OnInit {
     );
 
     // Si el usuario ya está autenticado, redirigir al mapa
-    if (this.authService.user) {
+    if (this.authService.currentUserValue) {
       this.router.navigate(['/']);
     }
   }
@@ -176,8 +174,13 @@ export class RegisterComponent implements OnInit {
       const { confirmPassword, ...registerData } = this.form.value;
       this.authService.register(registerData).subscribe({
         next: () => {
+          this.alertService.success('Éxito', 'Registro completado correctamente');
           this.router.navigate(['/']);
         },
+        error: (error) => {
+          this.alertService.error('Error', 'No se pudo completar el registro');
+          console.error('Error de registro:', error);
+        }
       });
     }
   }

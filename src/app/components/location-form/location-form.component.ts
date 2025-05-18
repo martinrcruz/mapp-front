@@ -405,14 +405,25 @@ export class LocationFormComponent implements OnInit, OnChanges {
 
     // Manejar la selección de ubicación
     modalRef.result.then(
-      (coordinates: [number, number]) => {
-        if (coordinates) {
-          // Confirmar la selección
-          if (confirm(`¿Estás seguro que deseas registrar esta ubicación "${this.form.get('name')?.value}"?`)) {
+      (result: { coordinates: [number, number]; addressDetails?: any }) => {
+        if (result && result.coordinates) {
+          // Almacenar coordenadas
+          this.form.patchValue({
+            coordinates: {
+              type: 'Point',
+              coordinates: result.coordinates
+            }
+          });
+          
+          // Si hay detalles de dirección, llenar los campos correspondientes
+          if (result.addressDetails) {
             this.form.patchValue({
-              coordinates: {
-                type: 'Point',
-                coordinates: coordinates
+              address: {
+                street: result.addressDetails.street || '',
+                city: result.addressDetails.city || '',
+                state: result.addressDetails.state || '',
+                country: result.addressDetails.country || '',
+                postalCode: result.addressDetails.postalCode || ''
               }
             });
           }

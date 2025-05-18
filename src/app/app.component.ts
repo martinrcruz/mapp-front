@@ -65,7 +65,7 @@ export class AppComponent implements OnInit {
 
   constructor(public authService: AuthService) {
     // Suscribirse a los cambios del usuario
-    this.authService.currentUser.subscribe(user => {
+    this.authService.currentUser$.subscribe(user => {
       this.isAuthenticated = this.authService.isAuthenticated();
       this.isAdmin = this.authService.isAdmin();
     });

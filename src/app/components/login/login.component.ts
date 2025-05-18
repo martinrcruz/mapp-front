@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
+import { AlertService } from '../../services/alert.service';
 
 @Component({
   selector: 'app-login',
@@ -13,12 +14,12 @@ import { CommonModule } from '@angular/common';
 })
 export class LoginComponent {
   loginForm: FormGroup;
-  error: string = '';
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private alertService: AlertService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -35,9 +36,10 @@ export class LoginComponent {
           } else {
             this.router.navigate(['/']);
           }
+          this.alertService.success('Éxito', 'Sesión iniciada correctamente');
         },
         error: (error: Error) => {
-          this.error = 'Error al iniciar sesión. Por favor, verifica tus credenciales.';
+          this.alertService.error('Error de inicio de sesión', 'Por favor, verifica tus credenciales');
           console.error('Error de login:', error.message);
         }
       });

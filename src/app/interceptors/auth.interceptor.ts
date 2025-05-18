@@ -21,9 +21,14 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError(error => {
-      if (error.status === 401) {
-        authService.logout();
-        router.navigate(['/login']);
+      if (error.status) {
+        if (error.status === 401) {
+          console.log('Error 401 Unauthorized interceptado:', error);
+          authService.logout();
+          router.navigate(['/login']);
+        }
+      } else {
+        console.warn('Error de red en interceptor:', error);
       }
       return throwError(() => error);
     })
