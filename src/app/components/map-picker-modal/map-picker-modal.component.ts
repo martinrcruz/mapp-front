@@ -104,7 +104,7 @@ export class MapPickerModalComponent implements OnInit, AfterViewInit {
     this.map = new mapboxgl.Map({
       container: this.mapContainer.nativeElement,
       style: 'mapbox://styles/mapbox/streets-v12',
-      center: this.initialCoordinates || [-70.6483, -33.4569], // Santiago de Chile por defecto
+      center: this.initialCoordinates || [-15.5, 28.0], // Islas Canarias, España por defecto
       zoom: 13
     });
 
