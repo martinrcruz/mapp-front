@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { LocationService } from '../../services/location.service';
 import { Location } from '../../models/location.model';
 import { LocationFormComponent } from '../location-form/location-form.component';
@@ -18,7 +19,8 @@ import { AlertService } from '../../services/alert.service';
     FormsModule, 
     ReactiveFormsModule,
     LocationFormComponent,
-    NgbPaginationModule
+    NgbPaginationModule,
+    RouterModule
   ]
 })
 export class LocationManagerComponent implements OnInit {
@@ -74,12 +76,17 @@ export class LocationManagerComponent implements OnInit {
     } else {
       const term = searchTerm.toLowerCase();
       this.filteredLocations = this.locations.filter(location => 
-        location.name.toLowerCase().includes(term) ||
+        location.companyName?.toLowerCase().includes(term) ||
+        location.comercialName?.toLowerCase().includes(term) ||
+        location.description?.toLowerCase().includes(term) ||
+        location.activity?.toLowerCase().includes(term) ||
         location.address?.street?.toLowerCase().includes(term) ||
         location.address?.city?.toLowerCase().includes(term) ||
         location.address?.state?.toLowerCase().includes(term) ||
         location.address?.country?.toLowerCase().includes(term) ||
-        location.type.toLowerCase().includes(term)
+        location.municipality?.toLowerCase().includes(term) ||
+        location.cif?.toLowerCase().includes(term) ||
+        location.cnae?.toLowerCase().includes(term)
       );
     }
     console.log(this.filteredLocations);

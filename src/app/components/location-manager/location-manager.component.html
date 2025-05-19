@@ -4,13 +4,22 @@
       <h2 class="fs-1 fw-bold">Administración de Locaciones</h2>
     </div>
     <div class="col-auto">
-      <button
-        (click)="openAddModal()"
-        class="btn btn-primary"
-      >
-        <i class="fas fa-plus me-2"></i>
-        Agregar Locación
-      </button>
+      <div class="btn-group">
+        <button
+          (click)="openAddModal()"
+          class="btn btn-primary me-2"
+        >
+          <i class="fas fa-plus me-2"></i>
+          Agregar Locación
+        </button>
+        <a
+          routerLink="/admin/locations/import"
+          class="btn btn-outline-primary"
+        >
+          <i class="fas fa-file-import me-2"></i>
+          Importación Masiva
+        </a>
+      </div>
     </div>
   </div>
 
@@ -39,9 +48,11 @@
           <thead class="table-light sticky-top bg-light">
             <tr>
               <th>Estado</th>
-              <th>Nombre</th>
-              <th>Tipo</th>
+              <th>Nombre Comercial</th>
+              <th>Nombre Empresa</th>
+              <th>Actividad</th>
               <th>Dirección</th>
+              <th>Info Adicional</th>
               <th>Contacto</th>
               <th>Creado por</th>
               <th>Fecha</th>
@@ -58,24 +69,15 @@
                   {{ location.isActive ? 'Activo' : 'Inactivo' }}
                 </span>
               </td>
+              <td>{{location.comercialName}}</td>
               <td>
-                <div class="fw-semibold">{{location.name}}</div>
-                <small class="text-muted">{{location.description}}</small>
+                <!-- <div class="fw-semibold">{{location.companyName}}</div> -->
+                <small class="text-muted">{{location.companyName}}</small>
               </td>
               <td>
-                <span class="badge rounded-pill" [ngClass]="{
-                  'bg-primary': location.type === 'restaurant',
-                  'bg-success': location.type === 'hotel',
-                  'bg-info': location.type === 'shop',
-                  'bg-secondary': location.type === 'other'
-                }">
-                  <i class="fas" [ngClass]="{
-                    'fa-utensils': location.type === 'restaurant',
-                    'fa-hotel': location.type === 'hotel',
-                    'fa-shopping-bag': location.type === 'shop',
-                    'fa-map-marker-alt': location.type === 'other'
-                  }"></i>
-                  {{location.type | titlecase}}
+                <span class="badge rounded-pill bg-info">
+                  <i class="fas fa-briefcase"></i>
+                  {{location.activity || 'N/A'}}
                 </span>
               </td>
               <td>
@@ -84,6 +86,11 @@
                   {{location.address?.city}}, {{location.address?.state}}
                   <br>{{location.address?.country}}
                 </small>
+              </td>
+              <td>
+                <div *ngIf="location.municipality"><small><i class="fas fa-map-marker-alt me-1"></i>{{location.municipality}}</small></div>
+                <div *ngIf="location.cif"><small><i class="fas fa-id-card me-1"></i>{{location.cif}}</small></div>
+                <div *ngIf="location.cnae"><small><i class="fas fa-industry me-1"></i>{{location.cnae}}</small></div>
               </td>
               <td>
                 <div *ngIf="location.contact?.phone">

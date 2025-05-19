@@ -6,6 +6,7 @@ import { LocationManagerComponent } from './components/location-manager/location
 import { UserManagerComponent } from './components/user-manager/user-manager.component';
 import { AdminGuard } from './guards/admin.guard';
 import { AdminComponent } from './components/admin/admin.component';
+import { LocationBulkImportComponent } from './components/location-bulk-import/location-bulk-import.component';
 
 const routes: Routes = [
   { path: '', component: PublicMapComponent },
@@ -18,6 +19,7 @@ const routes: Routes = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: PublicMapComponent },
       { path: 'locations', component: LocationManagerComponent },
+      { path: 'locations/import', component: LocationBulkImportComponent },
       { path: 'users', component: UserManagerComponent }
     ]
   },

@@ -37,6 +37,13 @@ export const routes: Routes = [
           ),
       },
       { 
+        path: 'locations/import', 
+        loadComponent: () =>
+          import('./components/location-bulk-import/location-bulk-import.component').then(
+            m => m.LocationBulkImportComponent
+          ),
+      },
+      { 
         path: 'users', 
         loadComponent: () =>
           import('./components/user-manager/user-manager.component').then(

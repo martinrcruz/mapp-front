@@ -105,7 +105,7 @@ export class MapPickerModalComponent implements OnInit, AfterViewInit {
       container: this.mapContainer.nativeElement,
       style: 'mapbox://styles/mapbox/streets-v12',
       center: this.initialCoordinates || [-15.5, 28.0], // Islas Canarias, España por defecto
-      zoom: 13
+      zoom: 15
     });
 
     // Agregar controles de navegación

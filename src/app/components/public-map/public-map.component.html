@@ -53,7 +53,7 @@
   <!-- Tarjeta de información de ubicación -->
   <div *ngIf="selectedLocation" class="location-card">
     <div class="location-card-header">
-      <h3 class="location-title">{{selectedLocation?.name}}</h3>
+      <h3 class="location-title">{{selectedLocation?.comercialName}}</h3>
       <button (click)="closeLocationInfo()" class="close-button">
         <i class="fas fa-times"></i>
       </button>
@@ -62,12 +62,12 @@
     <div class="location-card-body" style="max-height: 70vh; overflow-y: auto;">
       <div class="location-type">
         <i class="fas" [ngClass]="{
-          'fa-utensils': selectedLocation?.type === 'restaurant',
-          'fa-hotel': selectedLocation?.type === 'hotel',
-          'fa-shopping-bag': selectedLocation?.type === 'shop',
-          'fa-map-marker-alt': selectedLocation?.type === 'other'
+          'fa-utensils': selectedLocation?.activity === 'restaurant',
+          'fa-hotel': selectedLocation?.activity === 'hotel',
+          'fa-shopping-bag': selectedLocation?.activity === 'shop',
+          'fa-map-marker-alt': selectedLocation?.activity === 'other'
         }"></i>
-        <span>{{selectedLocation?.type | titlecase}}</span>
+        <span>{{selectedLocation?.activity | titlecase}}</span>
       </div>
 
       <div class="location-info">

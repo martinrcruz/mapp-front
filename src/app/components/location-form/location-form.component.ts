@@ -21,40 +21,45 @@ import { MapPickerModalComponent } from '../map-picker-modal/map-picker-modal.co
         <h6 class="form-section-title">Información básica</h6>
       </div>
       
-      <div class="col-md-8">
-        <label for="name" class="form-label">Nombre *</label>
+      <div class="col-md-6">
+        <label for="companyName" class="form-label">Nombre de Empresa *</label>
         <input
           type="text"
           class="form-control"
-          id="name"
-          formControlName="name"
-          [class.is-invalid]="form.get('name')?.invalid && form.get('name')?.touched"
+          id="companyName"
+          formControlName="companyName"
+          [class.is-invalid]="form.get('companyName')?.invalid && form.get('companyName')?.touched"
         />
-        <div class="invalid-feedback" *ngIf="form.get('name')?.errors?.['required']">
-          El nombre es requerido
+        <div class="invalid-feedback" *ngIf="form.get('companyName')?.errors?.['required']">
+          El nombre de empresa es requerido
         </div>
       </div>
 
-      <div class="col-md-4">
-        <label for="type" class="form-label">Tipo *</label>
-        <select
-          class="form-select"
-          id="type"
-          formControlName="type"
-          [class.is-invalid]="form.get('type')?.invalid && form.get('type')?.touched"
-        >
-          <option value="">Seleccione un tipo</option>
-          <option value="restaurant">Restaurante</option>
-          <option value="hotel">Hotel</option>
-          <option value="shop">Tienda</option>
-          <option value="other">Otro</option>
-        </select>
-        <div class="invalid-feedback" *ngIf="form.get('type')?.errors?.['required']">
-          El tipo es requerido
+      <div class="col-md-6">
+        <label for="comercialName" class="form-label">Nombre Comercial *</label>
+        <input
+          type="text"
+          class="form-control"
+          id="comercialName"
+          formControlName="comercialName"
+          [class.is-invalid]="form.get('comercialName')?.invalid && form.get('comercialName')?.touched"
+        />
+        <div class="invalid-feedback" *ngIf="form.get('comercialName')?.errors?.['required']">
+          El nombre comercial es requerido
         </div>
       </div>
 
-      <div class="col-12">
+      <div class="col-md-12 mt-3">
+        <label for="activity" class="form-label">Actividad</label>
+        <input
+          type="text"
+          class="form-control"
+          id="activity"
+          formControlName="activity"
+        />
+      </div>
+
+      <div class="col-12 mt-3">
         <label for="description" class="form-label">Descripción</label>
         <textarea
           class="form-control"
@@ -211,6 +216,41 @@ import { MapPickerModalComponent } from '../map-picker-modal/map-picker-modal.co
         </div>
       </div>
 
+      <!-- Información adicional -->
+      <div class="col-12">
+        <h6 class="form-section-title mt-3">Información adicional</h6>
+      </div>
+
+      <div class="col-md-4">
+        <label for="municipality" class="form-label">Municipio</label>
+        <input
+          type="text"
+          class="form-control"
+          id="municipality"
+          formControlName="municipality"
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label for="cif" class="form-label">CIF</label>
+        <input
+          type="text"
+          class="form-control"
+          id="cif"
+          formControlName="cif"
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label for="cnae" class="form-label">CNAE</label>
+        <input
+          type="text"
+          class="form-control"
+          id="cnae"
+          formControlName="cnae"
+        />
+      </div>
+
       <!-- Información de contacto -->
       <div class="col-12">
         <h6 class="form-section-title mt-3">Información de contacto</h6>
@@ -333,9 +373,10 @@ export class LocationFormComponent implements OnInit, OnChanges {
 
   private initForm(): void {
     this.form = this.fb.group({
-      name: ['', [Validators.required]],
+      companyName: ['', [Validators.required]],
+      comercialName: ['', [Validators.required]],
       description: [''],
-      type: ['', [Validators.required]],
+      activity: [''],
       coordinates: this.fb.group({
         type: ['Point'],
         coordinates: [[], [Validators.required]]
@@ -347,6 +388,9 @@ export class LocationFormComponent implements OnInit, OnChanges {
         country: ['', [Validators.required]],
         postalCode: ['']
       }),
+      municipality: [''],
+      cif: [''],
+      cnae: [''],
       contact: this.fb.group({
         phone: [''],
         email: ['', [Validators.email]],
@@ -401,7 +445,7 @@ export class LocationFormComponent implements OnInit, OnChanges {
     }
 
     // Pasar el nombre de la ubicación
-    modalRef.componentInstance.locationName = this.form.get('name')?.value;
+    modalRef.componentInstance.locationName = this.form.get('companyName')?.value;
 
     // Manejar la selección de ubicación
     modalRef.result.then(

@@ -25,11 +25,15 @@ export interface User {
 
 export interface Location {
   _id: string;
-  name: string;
+  companyName: string;
+  comercialName: string;
   description: string;
-  type: string;
+  activity?: string;
   coordinates: Coordinates;
   address: Address;
+  municipality?: string;
+  cif?: string;
+  cnae?: string;
   contact: Contact;
   createdBy?: User;
   isActive: boolean;
@@ -45,11 +49,15 @@ export interface LocationResponse {
 }
 
 export interface CreateLocationRequest {
-  name: string;
+  companyName: string;
+  comercialName: string;
   description: string;
-  type: string;
+  activity?: string;
   coordinates: Coordinates;
   address: Address;
+  municipality?: string;
+  cif?: string;
+  cnae?: string;
   contact: Contact;
 }
 

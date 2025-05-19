@@ -1,0 +1,68 @@
+// Estilos para el componente de importación masiva
+
+.container-fluid {
+  width: 100%;
+  padding-bottom: 2rem; // Añadir espacio al final para mejor UX
+}
+
+.form-section-title {
+  font-weight: 600;
+  color: #495057;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e9ecef;
+  margin-bottom: 1rem;
+}
+
+// Estilos para la tabla de previsualización
+.table {
+  font-size: 0.9rem;
+  
+  th {
+    font-weight: 600;
+    border-bottom-width: 1px;
+  }
+  
+  td {
+    vertical-align: middle;
+  }
+}
+
+// Mejorar el scroll en tablas responsivas
+.table-responsive {
+  overflow-x: auto;
+  width: 100%;
+}
+
+// Estilos para la barra de progreso
+.progress {
+  height: 1.5rem;
+}
+
+// Animación para el estado de carga
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.card {
+  animation: fadeIn 0.3s ease-in-out;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+// Estilos para los botones
+.btn-link {
+  font-weight: 500;
+  
+  &:hover {
+    text-decoration: underline !important;
+  }
+}
+
+// Estilos para los iconos
+.fas {
+  vertical-align: middle;
+} 

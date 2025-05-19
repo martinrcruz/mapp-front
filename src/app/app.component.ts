@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { AdminSidebarComponent } from './components/admin-sidebar/admin-sidebar.component';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './services/auth.service';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -14,8 +15,7 @@ import { AuthService } from './services/auth.service';
     `
       :host {
         display: block;
-        height: 100vh;
-        overflow: hidden;
+        min-height: 100vh;
       }
 
       .navbar {
@@ -28,9 +28,8 @@ import { AuthService } from './services/auth.service';
       }
 
       .d-flex {
-        height: calc(100vh - 130px);
+        min-height: calc(100vh - 130px);
         margin-top: 130px;
-        overflow: hidden;
       }
 
       .sidebar {
@@ -47,14 +46,20 @@ import { AuthService } from './services/auth.service';
 
       .main-content {
         width: 100%;
-        height: calc(100vh - 56px);
+        min-height: calc(100vh - 56px);
         transition: all 0.3s ease;
-        overflow: hidden;
+        overflow-y: auto;
       }
 
       .main-content.with-sidebar {
         margin-left: 20%;
         width: 80%;
+      }
+      
+      /* Solo aplicar restricción de altura para Public Map */
+      .public-map-container {
+        height: 100vh;
+        overflow: hidden;
       }
     `,
   ],
@@ -62,12 +67,21 @@ import { AuthService } from './services/auth.service';
 export class AppComponent implements OnInit {
   isAdmin: boolean = false;
   isAuthenticated: boolean = false;
+  isPublicMapRoute: boolean = false;
 
-  constructor(public authService: AuthService) {
+  constructor(public authService: AuthService, private router: Router) {
     // Suscribirse a los cambios del usuario
     this.authService.currentUser$.subscribe(user => {
       this.isAuthenticated = this.authService.isAuthenticated();
       this.isAdmin = this.authService.isAdmin();
+    });
+    
+    // Suscribirse a los cambios de ruta
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: any) => {
+      // Actualizar isPublicMapRoute basado en la URL actual
+      this.isPublicMapRoute = (event.url === '/' || event.url === '/admin/dashboard');
     });
   }
 
@@ -75,5 +89,7 @@ export class AppComponent implements OnInit {
     // Verificar el estado inicial
     this.isAuthenticated = this.authService.isAuthenticated();
     this.isAdmin = this.authService.isAdmin();
+    // Verificar la ruta inicial
+    this.isPublicMapRoute = (this.router.url === '/' || this.router.url === '/admin/dashboard');
   }
 }
