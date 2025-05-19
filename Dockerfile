@@ -3,6 +3,8 @@
   WORKDIR /app
   COPY package*.json ./
   RUN npm install --legacy-peer-deps
+  # Asegurar que @popperjs/core esté instalado correctamente
+  RUN npm install @popperjs/core --legacy-peer-deps
   COPY . .
   RUN npm run build -- --configuration=production   # o tu comando de build
   
